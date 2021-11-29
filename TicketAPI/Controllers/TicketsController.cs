@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DataAccess;
 using DataAccess.Entities;
+using DataAccess.Repository;
 
 namespace TicketAPI.Controllers
 {
@@ -14,25 +15,25 @@ namespace TicketAPI.Controllers
     [ApiController]
     public class TicketsController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly IRepository _repository;
 
-        public TicketsController(DataContext context)
+        public TicketsController(IRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         // GET: api/Tickets
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Ticket>>> GetTickets()
+        public ActionResult<IEnumerable<Ticket>> GetTickets()
         {
-            return await _context.Tickets.ToListAsync();
+            return _repository.GetAll().ToList();
         }
 
         // GET: api/Tickets/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Ticket>> GetTicket(int id)
+        public ActionResult<Ticket> GetTicket(int id)
         {
-            var ticket = await _context.Tickets.FindAsync(id);
+            var ticket = _repository.GetTicket(id);
 
             if (ticket == null)
             {
@@ -52,11 +53,10 @@ namespace TicketAPI.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(ticket).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                _repository.UpdateTicket(ticket);
+                await _repository.SaveAllAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -78,8 +78,8 @@ namespace TicketAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Ticket>> PostTicket(Ticket ticket)
         {
-            _context.Tickets.Add(ticket);
-            await _context.SaveChangesAsync();
+            _repository.AddTicket(ticket);
+            await _repository.SaveAllAsync();
 
             return CreatedAtAction("GetTicket", new { id = ticket.Id }, ticket);
         }
@@ -88,21 +88,21 @@ namespace TicketAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTicket(int id)
         {
-            var ticket = await _context.Tickets.FindAsync(id);
+            var ticket = _repository.GetTicket(id);
             if (ticket == null)
             {
                 return NotFound();
             }
 
-            _context.Tickets.Remove(ticket);
-            await _context.SaveChangesAsync();
+            _repository.RemoveTicket(ticket);
+            await _repository.SaveAllAsync();
 
             return NoContent();
         }
 
         private bool TicketExists(int id)
         {
-            return _context.Tickets.Any(e => e.Id == id);
+            return _repository.TicketExists(id);
         }
     }
 }
