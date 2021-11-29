@@ -16,8 +16,23 @@ builder.Services.AddDbContext<DataContext>(cfg =>
     cfg.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.AddTransient<SeedDb>();
 builder.Services.AddScoped<IRepository, Repository>();
+
 var app = builder.Build();
+
+RunSeeding(app);
+
+void RunSeeding(IHost app)
+{
+    var scopedFactory = app.Services.GetService<IServiceScopeFactory>();
+
+    using (var scope = scopedFactory.CreateScope())
+    {
+        var service = scope.ServiceProvider.GetService<SeedDb>();
+        service.SeedAsync().Wait();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
