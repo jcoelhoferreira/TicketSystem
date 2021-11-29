@@ -40,15 +40,15 @@ namespace DataAccess
                     UserName = "ticketsadmin@yopmail.com",
                     Email = "ticketsadmin@yopmail.com"
                 };
-            }
 
-            var result = await _userHelper.AddUserAsync(user, "123456");
-            if(result != IdentityResult.Success)
-            {
-                throw new InvalidOperationException("Could not create the user in seeder");
-            }
+                var result = await _userHelper.AddUserAsync(user, "123456");
+                if (result != IdentityResult.Success)
+                {
+                    throw new InvalidOperationException("Could not create the user in seeder");
+                }
 
-            await _userHelper.AddUserToRoleAsync(user, "Admin");
+                await _userHelper.AddUserToRoleAsync(user, "Admin");
+            }
 
             var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin");
             if (!isInRole)
@@ -66,15 +66,15 @@ namespace DataAccess
                     UserName = "luisclient@yopmail.com",
                     Email = "luisclient@yopmail.com"
                 };
-            }
 
-            var result2 = await _userHelper.AddUserAsync(user2, "123456");
-            if (result2 != IdentityResult.Success)
-            {
-                throw new InvalidOperationException("Could not create the user in seeder");
-            }
+                var result2 = await _userHelper.AddUserAsync(user2, "123456");
+                if (result2 != IdentityResult.Success)
+                {
+                    throw new InvalidOperationException("Could not create the user in seeder");
+                }
 
-            await _userHelper.AddUserToRoleAsync(user2, "Client");
+                await _userHelper.AddUserToRoleAsync(user2, "Client");
+            }
 
             var isInRole2 = await _userHelper.IsUserInRoleAsync(user2, "Client");
             if (!isInRole2)
