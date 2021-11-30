@@ -26,7 +26,7 @@ namespace TicketAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Ticket>> GetTickets()
         {
-            return _repository.GetAll().ToList();
+            return _repository.GetAllWithUsers().ToList();
         }
 
         // GET: api/Tickets/5

@@ -12,6 +12,7 @@ namespace DataAccess.Repository
         void AddTicket(Ticket ticket);
         Ticket GetTicket(int id);
         IEnumerable<Ticket> GetAll();
+        IEnumerable<Ticket> GetAllWithUsers();
         void RemoveTicket(Ticket ticket);
         Task<bool> SaveAllAsync();
         void UpdateTicket(Ticket ticket);

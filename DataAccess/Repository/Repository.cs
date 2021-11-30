@@ -1,4 +1,5 @@
 ﻿using DataAccess.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,13 @@ namespace DataAccess.Repository
         public IEnumerable<Ticket> GetAll()
         {
             return _dataContext.Tickets.ToList();
+        }
+
+        public IEnumerable<Ticket> GetAllWithUsers()
+        {
+            return _dataContext.Tickets.
+                Include(t => t.User).
+                ToList();
         }
 
         public Ticket GetTicket(int id)
