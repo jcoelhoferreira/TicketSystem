@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 using TicketModule.Models;
+using TicketModule.ViewModels;
 
 namespace TicketModule.Services
 {
@@ -13,9 +15,29 @@ namespace TicketModule.Services
     {
         private string baseUrl = "https://localhost:7249/api/";
 
-        public Task<Response> CreateApiTicket(Ticket ticket)
+        public async Task<Response> CreateApiTicket(NewTicketViewModel ticket)
         {
-            throw new NotImplementedException();
+            var client = new HttpClient();
+            client.BaseAddress = new Uri(baseUrl);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var response = client.PostAsJsonAsync("Tickets", ticket).Result;
+            var result = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new Response
+                {
+                    IsSuccess = false,
+                    Message = result
+                };
+            }
+
+            return new Response
+            {
+                IsSuccess = true,
+                Message = "Your ticket was submitted successfuly. Our team is working on your issue!"
+            };
         }
 
         public Task<Response> DeleteApiTicket(int id)
@@ -47,9 +69,9 @@ namespace TicketModule.Services
                     };
                 }
 
-                var adressInfo = JsonConvert.DeserializeObject<List<Ticket>>(result);
+                var apiInfo = JsonConvert.DeserializeObject<List<Ticket>>(result);
 
-                if (adressInfo.Count == 0)
+                if (apiInfo.Count == 0)
                 {
                     return new Response
                     {
@@ -61,7 +83,7 @@ namespace TicketModule.Services
                 return new Response
                 {
                     IsSuccess = true,
-                    Result = adressInfo
+                    Result = apiInfo
                 };
             }
             catch (Exception e)

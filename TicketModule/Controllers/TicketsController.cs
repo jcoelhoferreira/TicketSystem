@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TicketModule.Models;
 using TicketModule.Services;
+using TicketModule.ViewModels;
 
 namespace TicketModule
 {
@@ -14,7 +16,7 @@ namespace TicketModule
         }
 
         // GET: TicketsController
-        public ActionResult Index()
+        public IActionResult Index()
         {
             var result = _apiService.GetAllApiTickets().Result.Result;
 
@@ -28,7 +30,7 @@ namespace TicketModule
         }
 
         // GET: TicketsController/Create
-        public ActionResult Create()
+        public IActionResult Create()
         {
             return View();
         }
@@ -36,16 +38,23 @@ namespace TicketModule
         // POST: TicketsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(NewTicketViewModel ticket)
         {
-            try
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
+                try
+                {
+                    var result = await _apiService.CreateApiTicket(ticket);
+                    ViewBag.Message = result.Message;
+                }
+                catch (Exception e)
+                {
+                    ViewBag.Message = e.Message.ToString();
+                }
                 return View();
             }
+            ViewBag.Error = "Invalid values, please try again.";
+            return View();
         }
 
         // GET: TicketsController/Edit/5

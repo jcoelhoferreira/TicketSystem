@@ -1,5 +1,76 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model TicketModule.ViewModels.NewTicketViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
 @{
+    ViewData["Title"] = "Create Ticket";
+    Layout = "_Layout";
+}
+
+<!--/ Intro Single star /-->
+<section class="intro-single">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 col-lg-8">
+                <div class="title-single-box">
+                    <h1 class="title-single">Create new Ticket</h1>
+                </div>
+            </div>
+            <div class="col-md-12 col-lg-4">
+                <nav aria-label="breadcrumb" class="breadcrumb-box d-flex justify-content-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            Ticket
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+<!--/ Intro Single End /-->
+<!--/ Signin Form /-->
+<section class="ftco-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-12 col-lg-10">
+                @if (ViewBag.Message != null || ViewBag.Error != null)
+                {
+                <div class="alert alert-success" role="alert">
+                    <center>
+                        <h3>
+                            @ViewBag.Message
+                            @ViewBag.Error
+                        </h3>
+                    </center>
+                </div>
+                }
+                <div class="login-wrap p-4 p-md-5">
+                    <form method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Title" class="label" for="title">Title</label>
+                        <input asp-for="Title" type="text" class="form-control" placeholder="Problem subject..." required>
+                        <span asp-validation-for="Title" class="text-warning"></span>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label asp-for="Description" class="label" for="title">Description</label>
+                        <textarea asp-for="Description" type="text" class="form-control" placeholder="Describe us your problem..." cols="45" rows="8" required></textarea>
+                        <span asp-validation-for="Description" class="text-warning"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Submit" class="form-control btn btn-success rounded submit px-3" />
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
 }
