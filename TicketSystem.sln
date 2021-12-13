@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketWeb", "TicketWeb\Tick
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketModule", "TicketModule\TicketModule.csproj", "{C7C98250-F94B-49EB-A938-B3113670C600}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TicketAPI", "TicketAPI\TicketAPI.csproj", "{D2AE8471-DED2-4BE8-A545-7EB4EA82B182}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketAPI", "TicketAPI\TicketAPI.csproj", "{D2AE8471-DED2-4BE8-A545-7EB4EA82B182}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{C68851A4-14BF-4D51-8099-C833E38F3997}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\DataAccess.csproj", "{C68851A4-14BF-4D51-8099-C833E38F3997}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountModule", "AccountModule\AccountModule.csproj", "{049EB2CB-9FF7-46E3-816F-1BD90FCA89CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{C68851A4-14BF-4D51-8099-C833E38F3997}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C68851A4-14BF-4D51-8099-C833E38F3997}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C68851A4-14BF-4D51-8099-C833E38F3997}.Release|Any CPU.Build.0 = Release|Any CPU
+		{049EB2CB-9FF7-46E3-816F-1BD90FCA89CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{049EB2CB-9FF7-46E3-816F-1BD90FCA89CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{049EB2CB-9FF7-46E3-816F-1BD90FCA89CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{049EB2CB-9FF7-46E3-816F-1BD90FCA89CA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

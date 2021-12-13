@@ -11,11 +11,11 @@ using TicketModule.ViewModels;
 
 namespace TicketModule.Services
 {
-    public class ApiService : IApiService
+    public class ApiTicketService : IApiTicketService
     {
         private string baseUrl = "https://localhost:7249/api/";
 
-        public async Task<Response> CreateApiTicket(NewTicketViewModel ticket)
+        public async Task<TicketResponse> CreateApiTicket(NewTicketViewModel ticket)
         {
             var client = new HttpClient();
             client.BaseAddress = new Uri(baseUrl);
@@ -26,31 +26,31 @@ namespace TicketModule.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                return new Response
+                return new TicketResponse
                 {
                     IsSuccess = false,
                     Message = result
                 };
             }
 
-            return new Response
+            return new TicketResponse
             {
                 IsSuccess = true,
                 Message = "Your ticket was submitted successfuly. Our team is working on your issue!"
             };
         }
 
-        public Task<Response> DeleteApiTicket(int id)
+        public Task<TicketResponse> DeleteApiTicket(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Response> EditApiTicket(Ticket ticket)
+        public Task<TicketResponse> EditApiTicket(Ticket ticket)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<Response> GetAllApiTickets()
+        public async Task<TicketResponse> GetAllApiTickets()
         {
             try
             {
@@ -62,7 +62,7 @@ namespace TicketModule.Services
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return new Response
+                    return new TicketResponse
                     {
                         IsSuccess = false,
                         Message = result
@@ -73,14 +73,14 @@ namespace TicketModule.Services
 
                 if (apiInfo.Count == 0)
                 {
-                    return new Response
+                    return new TicketResponse
                     {
                         IsSuccess = false,
                         Message = result
                     };
                 }
 
-                return new Response
+                return new TicketResponse
                 {
                     IsSuccess = true,
                     Result = apiInfo
@@ -88,7 +88,7 @@ namespace TicketModule.Services
             }
             catch (Exception e)
             {
-                return new Response
+                return new TicketResponse
                 {
                     IsSuccess = false,
                     Message = e.Message
@@ -96,9 +96,48 @@ namespace TicketModule.Services
             }
         }
 
-        public Task<Response> GetApiTicket(int id)
+        public async Task<TicketResponse> GetApiTicket(int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var client = new HttpClient();
+                client.BaseAddress = new Uri(baseUrl);
+
+                var response = await client.GetAsync("Tickets/" + id);
+                var result = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new TicketResponse
+                    {
+                        IsSuccess = false,
+                        Message = result
+                    };
+                }
+
+                var apiInfo = JsonConvert.DeserializeObject<Ticket>(result);
+
+                if (apiInfo == null)
+                {
+                    return new TicketResponse
+                    {
+                        IsSuccess = false,
+                        Message = result
+                    };
+                }
+
+                return new TicketResponse
+                {
+                    IsSuccess = true,
+                    Result = apiInfo
+                };
+
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }

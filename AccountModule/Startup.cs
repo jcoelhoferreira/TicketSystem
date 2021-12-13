@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TicketModule.Services;
 
 namespace TicketModule
 {
@@ -13,7 +12,7 @@ namespace TicketModule
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IApiTicketService, ApiTicketService>();
+            
         }
         
     }

@@ -8,9 +8,9 @@ namespace TicketModule
 {
     public class TicketsController : Controller
     {
-        private readonly IApiService _apiService;
+        private readonly IApiTicketService _apiService;
 
-        public TicketsController(IApiService apiService)
+        public TicketsController(IApiTicketService apiService)
         {
             _apiService = apiService;
         }
@@ -58,9 +58,16 @@ namespace TicketModule
         }
 
         // GET: TicketsController/Edit/5
-        public ActionResult Edit(int id)
+        public IActionResult Edit(int? id)
         {
-            return View();
+            if(id == null)
+            {
+                return NotFound();
+            }
+
+            var model = _apiService.GetApiTicket(id.Value).Result.Result;
+
+            return View(model);
         }
 
         // POST: TicketsController/Edit/5

@@ -89,17 +89,17 @@ namespace DataAccess
                     "Não consigo fazer login na aplicação." +
                     " Gostava que me ajudassem o mais ráido possível",
                     false,
-                    user);
+                    user2);
                 AddTicket("O bluetooth não funciona",
                     "Não consigo sincronizar os aparelhos." +
                     " Gostava que me ajudassem o mais ráido possível",
                     false,
-                    user);
+                    user2);
                 AddTicket("A aplicação crasha no arranque",
                     "A aplicação não arranca." +
                     " Gostava que me ajudassem o mais ráido possível",
                     false,
-                    user);
+                    user2);
                 await _dataContext.SaveChangesAsync();
             }
         }
