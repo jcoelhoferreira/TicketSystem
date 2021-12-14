@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using TicketAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,27 +36,28 @@ builder.Services.AddIdentity<User, IdentityRole>(cfg =>
   .AddEntityFrameworkStores<DataContext>()
   .AddDefaultTokenProviders();
 
-//builder.Services.AddAuthentication(auth =>
-//{
-//    auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//}).AddJwtBearer(cfg =>
-//{
-//    cfg.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-//    {
-//        ValidateIssuer = true,
-//        ValidateAudience = true,
-//        ValidIssuer = builder.Configuration["Tokens:Issuer"],
-//        ValidAudience = builder.Configuration["Tokens:Audience"],
-//        RequireExpirationTime = true,
-//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Tokens:Key"])),
-//        ValidateIssuerSigningKey = true
-//    };
-//});
+builder.Services.AddAuthentication(auth =>
+{
+    auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(cfg =>
+{
+    cfg.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidIssuer = builder.Configuration["Tokens:Issuer"],
+        ValidAudience = builder.Configuration["Tokens:Audience"],
+        RequireExpirationTime = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Tokens:Key"])),
+        ValidateIssuerSigningKey = true
+    };
+});
 
 builder.Services.AddTransient<SeedDb>();
 builder.Services.AddScoped<IUserHelper, UserHelper>();
 builder.Services.AddScoped<IRepository, Repository>();
+builder.Services.AddScoped<IDecryption, Decryption>();
 
 var app = builder.Build();
 

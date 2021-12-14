@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Routing;
+﻿using AccountModule.Services;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,8 @@ namespace TicketModule
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            
+            services.AddScoped<IApiUserService, ApiUserService>();
+            services.AddScoped<IEncryption, Encryption>();
         }
         
     }

@@ -23,7 +23,7 @@ namespace AccountModule.ViewModels
         public string Password { get; set; }
         [Required]
         [Compare("Password")]
-        public int ConfirmPassword { get; set; }
+        public string ConfirmPassword { get; set; }
 
     }
 }

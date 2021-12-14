@@ -8,10 +8,12 @@ namespace AccountModule
     public class AccountController : Controller
     {
         private readonly IApiUserService _apiService;
+        private readonly IEncryption _encryption;
 
-        public AccountController(IApiUserService apiService)
+        public AccountController(IApiUserService apiService, IEncryption encryption)
         {
             _apiService = apiService;
+            _encryption = encryption;
         }
 
         //// GET: AccountController
@@ -29,7 +31,7 @@ namespace AccountModule
         //}
 
         // GET: TicketsController/Create
-        public IActionResult Create()
+        public IActionResult Register()
         {
             return View();
         }
@@ -37,13 +39,21 @@ namespace AccountModule
         // POST: TicketsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel user)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
+                var newModel = new RegisterViewModel
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.Email,
+                    Password = _encryption.EncryptString(model.Password)
+                };
+
                 try
                 {
-                    var result = await _apiService.RegisterAsync(user);
+                    var result = await _apiService.RegisterAsync(newModel);
                     ViewBag.Message = result.Message;
                 }
                 catch (Exception e)
