@@ -1,4 +1,5 @@
 ﻿using AccountModule.ViewModels;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace AccountModule.Services
             client.BaseAddress = new Uri(baseUrl);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var response = client.PostAsJsonAsync("Account", model).Result;
+            var response = client.PostAsJsonAsync("Account/Register", model).Result;
             var result = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
@@ -35,6 +36,34 @@ namespace AccountModule.Services
             {
                 IsSuccess = true,
                 Message = "Your registration is complete, Check your email for more information."
+            };
+        }
+
+        public async Task<UserResponse> LoginAsync(LoginViewModel model)
+        {
+            var client = new HttpClient();
+            client.BaseAddress = new Uri(baseUrl);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var response = client.PostAsJsonAsync("Account/Login", model).Result;
+            var result = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return new UserResponse
+                {
+                    IsSuccess = false,
+                    Message = result
+                };
+            }
+
+            var userInfo = JsonConvert.DeserializeObject<UserResponseViewModel>(result);
+
+            return new UserResponse
+            {
+                IsSuccess = true,
+                Message = $"Welcome {userInfo.FirstName}!",
+                Result = userInfo
             };
         }
     }

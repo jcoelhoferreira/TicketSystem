@@ -1,10 +1,10 @@
 ﻿using DataAccess.Entities;
 using DataAccess.Helpers;
+using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TicketAPI.Services;
-using TicketAPI.ViewModels;
 
 namespace TicketAPI.Controllers
 {
@@ -21,11 +21,12 @@ namespace TicketAPI.Controllers
             _decrypton = decrypton;
         }
 
-        // POST: api/Account
-        [HttpPost]
-        public async Task<IActionResult> PostUser(RegisterViewModel model)
+        // POST: api/Account/Register
+        [HttpPost("Register")]
+        public async Task<IActionResult> CreateUser(RegisterViewModel model)
         {
-            var user = await _userHelper.GetUserByEmailAsync(model.Email);
+            var email = _decrypton.DecryptString(model.Email);
+            var user = await _userHelper.GetUserByEmailAsync(email);
 
             if(user == null)
             {
@@ -33,11 +34,16 @@ namespace TicketAPI.Controllers
                 {
                     FirstName = model.FirstName,
                     LastName = model.LastName,
-                    Email = model.Email,
-                    UserName = model.Email,
+                    Email = email,
+                    UserName = email,
                 };
 
-                var result = await _userHelper.AddUserAsync(user, _decrypton.DecryptString(model.Password));
+                var password = _decrypton.DecryptString(model.Password);
+                var result = await _userHelper.AddUserAsync(user, password);
+
+                await _userHelper.CheckRoleAsync("Client");
+                await _userHelper.AddUserToRoleAsync(user, "Client");
+
                 if (result != IdentityResult.Success)
                 {
                     ModelState.AddModelError(string.Empty, "The user couldn't be created.");
@@ -45,6 +51,36 @@ namespace TicketAPI.Controllers
                 }
 
                 return Ok();
+            }
+
+            return NotFound();
+        }
+
+        // POST: api/Account/Login
+        [HttpPost("Login")]
+        public async Task<IActionResult> LoginUser(LoginViewModel model)
+        {
+            model.Email = _decrypton.DecryptString(model.Email);
+            model.Password = _decrypton.DecryptString(model.Password);
+            var user = await _userHelper.GetUserByEmailAsync(model.Email);
+
+            if(user == null)
+            {
+                return NotFound();
+            }
+
+            var result = await _userHelper.LoginAsync(model);
+
+            if (result.Succeeded)
+            {
+                var userResponse = new UserResponseViewModel
+                {
+                    FirstName = user.FirstName,
+                    UserName = user.UserName,
+                    Role = _userHelper.GetRoleAsync(user).Result
+                };
+
+                return Ok(userResponse);
             }
 
             return NotFound();

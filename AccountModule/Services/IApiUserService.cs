@@ -11,5 +11,7 @@ namespace AccountModule.Services
     public interface IApiUserService
     {
         Task<UserResponse> RegisterAsync(RegisterViewModel model);
+
+        Task<UserResponse> LoginAsync(LoginViewModel model);
     }
 }

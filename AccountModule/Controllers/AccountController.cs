@@ -16,44 +16,60 @@ namespace AccountModule
             _encryption = encryption;
         }
 
-        //// GET: AccountController
-        //public IActionResult Index()
-        //{
-        //    var result = _apiService.GetAllApiTickets().Result.Result;
+        public IActionResult Login()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            return View();
+        }
 
-        //    return View(result);
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.Email = _encryption.EncryptString(model.Email);
+                model.Password = _encryption.EncryptString(model.Password);
+                try
+                {
+                    var result = await _apiService.LoginAsync(model);
+                    if (result.IsSuccess)
+                    {
+                        ViewBag.Message = result.Message;
+                        return View();
+                    }
+                    
+                }
+                catch (Exception e)
+                {
+                    ViewBag.Message = e.Message.ToString();
+                }
+            }
 
-        //// GET: TicketsController/Details/5
-        //public ActionResult Details(int id)
-        //{
-        //    return View();
-        //}
+            this.ModelState.AddModelError(string.Empty, "Failed to login!");
+            return View();
+        }
 
-        // GET: TicketsController/Create
+
         public IActionResult Register()
         {
             return View();
         }
 
-        // POST: TicketsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var newModel = new RegisterViewModel
-                {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Email = model.Email,
-                    Password = _encryption.EncryptString(model.Password)
-                };
-
+                model.Email = _encryption.EncryptString(model.Email);
+                model.Password = _encryption.EncryptString(model.Password);
                 try
                 {
-                    var result = await _apiService.RegisterAsync(newModel);
+                    var result = await _apiService.RegisterAsync(model);
                     ViewBag.Message = result.Message;
                 }
                 catch (Exception e)
