@@ -15,7 +15,55 @@ namespace TicketModule.Services
     {
         private string baseUrl = "https://localhost:7249/api/";
 
-        public async Task<TicketResponse> CreateApiTicket(NewTicketViewModel ticket)
+        public async Task<ApiResponse> GetUserApiTickets(string username)
+        {
+            try
+            {
+                var client = new HttpClient();
+                client.BaseAddress = new Uri(baseUrl);
+
+                var response = await client.GetAsync("Tickets/" + username + "/ticket");
+                var result = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Message = result
+                    };
+                }
+
+                var apiInfo = JsonConvert.DeserializeObject<List<Ticket>>(result);
+
+                if (apiInfo.Count == 0)
+                {
+                    return new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Message = result
+                    };
+                }
+
+                return new ApiResponse
+                {
+                    IsSuccess = true,
+                    Result = apiInfo
+                };
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    IsSuccess = false,
+                    Message = e.Message
+                };
+            }
+        }
+
+        
+
+        public async Task<ApiResponse> CreateApiTicket(NewTicketViewModel ticket)
         {
             var client = new HttpClient();
             client.BaseAddress = new Uri(baseUrl);
@@ -26,31 +74,31 @@ namespace TicketModule.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                return new TicketResponse
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     Message = result
                 };
             }
 
-            return new TicketResponse
+            return new ApiResponse
             {
                 IsSuccess = true,
                 Message = "Your ticket was submitted successfuly. Our team is working on your issue!"
             };
         }
 
-        public Task<TicketResponse> DeleteApiTicket(int id)
+        public Task<ApiResponse> DeleteApiTicket(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<TicketResponse> EditApiTicket(Ticket ticket)
+        public Task<ApiResponse> EditApiTicket(Ticket ticket)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<TicketResponse> GetAllApiTickets()
+        public async Task<ApiResponse> GetAllApiTickets()
         {
             try
             {
@@ -62,7 +110,7 @@ namespace TicketModule.Services
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return new TicketResponse
+                    return new ApiResponse
                     {
                         IsSuccess = false,
                         Message = result
@@ -73,14 +121,14 @@ namespace TicketModule.Services
 
                 if (apiInfo.Count == 0)
                 {
-                    return new TicketResponse
+                    return new ApiResponse
                     {
                         IsSuccess = false,
                         Message = result
                     };
                 }
 
-                return new TicketResponse
+                return new ApiResponse
                 {
                     IsSuccess = true,
                     Result = apiInfo
@@ -88,7 +136,7 @@ namespace TicketModule.Services
             }
             catch (Exception e)
             {
-                return new TicketResponse
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     Message = e.Message
@@ -96,7 +144,7 @@ namespace TicketModule.Services
             }
         }
 
-        public async Task<TicketResponse> GetApiTicket(int id)
+        public async Task<ApiResponse> GetApiTicket(int id)
         {
             try
             {
@@ -108,7 +156,7 @@ namespace TicketModule.Services
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    return new TicketResponse
+                    return new ApiResponse
                     {
                         IsSuccess = false,
                         Message = result
@@ -119,14 +167,14 @@ namespace TicketModule.Services
 
                 if (apiInfo == null)
                 {
-                    return new TicketResponse
+                    return new ApiResponse
                     {
                         IsSuccess = false,
                         Message = result
                     };
                 }
 
-                return new TicketResponse
+                return new ApiResponse
                 {
                     IsSuccess = true,
                     Result = apiInfo

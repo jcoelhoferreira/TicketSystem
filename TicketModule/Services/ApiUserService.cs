@@ -1,4 +1,4 @@
-﻿using AccountModule.ViewModels;
+﻿using TicketModule.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -8,13 +8,13 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AccountModule.Services
+namespace TicketModule.Services
 {
     public class ApiUserService : IApiUserService
     {
         private string baseUrl = "https://localhost:7249/api/";
 
-        public async Task<UserResponse> RegisterAsync(RegisterViewModel model)
+        public async Task<ApiResponse> RegisterAsync(RegisterViewModel model)
         {
             var client = new HttpClient();
             client.BaseAddress = new Uri(baseUrl);
@@ -25,21 +25,21 @@ namespace AccountModule.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                return new UserResponse
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     Message = result
                 };
             }
 
-            return new UserResponse
+            return new ApiResponse
             {
                 IsSuccess = true,
                 Message = "Your registration is complete, Check your email for more information."
             };
         }
 
-        public async Task<UserResponse> LoginAsync(LoginViewModel model)
+        public async Task<ApiResponse> LoginAsync(LoginViewModel model)
         {
             var client = new HttpClient();
             client.BaseAddress = new Uri(baseUrl);
@@ -50,7 +50,7 @@ namespace AccountModule.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                return new UserResponse
+                return new ApiResponse
                 {
                     IsSuccess = false,
                     Message = result
@@ -59,7 +59,7 @@ namespace AccountModule.Services
 
             var userInfo = JsonConvert.DeserializeObject<UserResponseViewModel>(result);
 
-            return new UserResponse
+            return new ApiResponse
             {
                 IsSuccess = true,
                 Message = $"Welcome {userInfo.FirstName}!",

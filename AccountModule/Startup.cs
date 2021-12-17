@@ -13,8 +13,7 @@ namespace TicketModule
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IApiUserService, ApiUserService>();
-            services.AddScoped<IEncryption, Encryption>();
+
         }
         
     }

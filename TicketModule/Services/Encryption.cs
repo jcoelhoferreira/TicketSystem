@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace AccountModule.Services
+namespace TicketModule.Services
 {
     public class Encryption : IEncryption
     {

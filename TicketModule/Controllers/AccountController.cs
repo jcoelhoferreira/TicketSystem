@@ -1,27 +1,23 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using AccountModule.Services;
-using AccountModule.ViewModels;
+using TicketModule.Services;
+using TicketModule.ViewModels;
 
-namespace AccountModule
+namespace TicketModule
 {
     public class AccountController : Controller
     {
-        private readonly IApiUserService _apiService;
+        private readonly IApiUserService _apiUserService;
         private readonly IEncryption _encryption;
 
-        public AccountController(IApiUserService apiService, IEncryption encryption)
+        public AccountController(IApiUserService apiUserService, IEncryption encryption)
         {
-            _apiService = apiService;
+            _apiUserService = apiUserService;
             _encryption = encryption;
         }
 
         public IActionResult Login()
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Index", "Home");
-            }
             return View();
         }
 
@@ -35,11 +31,20 @@ namespace AccountModule
                 model.Password = _encryption.EncryptString(model.Password);
                 try
                 {
-                    var result = await _apiService.LoginAsync(model);
+                    var result = await _apiUserService.LoginAsync(model);
                     if (result.IsSuccess)
                     {
+                        var user = (UserResponseViewModel)result.Result;
+
+                        if(user.Role == "Client")
+                        {
+                            var username = _encryption.EncryptString(user.UserName);
+                            TempData["username"] = username;
+                            return RedirectToAction("IndexClient", "Tickets");
+                        }
+
                         ViewBag.Message = result.Message;
-                        return View();
+                        return RedirectToAction("Index","Home");
                     }
                     
                 }
@@ -69,7 +74,7 @@ namespace AccountModule
                 model.Password = _encryption.EncryptString(model.Password);
                 try
                 {
-                    var result = await _apiService.RegisterAsync(model);
+                    var result = await _apiUserService.RegisterAsync(model);
                     ViewBag.Message = result.Message;
                 }
                 catch (Exception e)

@@ -10,10 +10,11 @@ namespace TicketModule.Services
 {
     public interface IApiTicketService
     {
-        Task<TicketResponse> GetAllApiTickets();
-        Task<TicketResponse> GetApiTicket(int id);
-        Task<TicketResponse> CreateApiTicket(NewTicketViewModel ticket);
-        Task<TicketResponse> EditApiTicket(Ticket ticket);
-        Task<TicketResponse> DeleteApiTicket(int id);
+        Task<ApiResponse> GetAllApiTickets();
+        Task<ApiResponse> GetApiTicket(int id);
+        Task<ApiResponse> CreateApiTicket(NewTicketViewModel ticket);
+        Task<ApiResponse> EditApiTicket(Ticket ticket);
+        Task<ApiResponse> DeleteApiTicket(int id);
+        Task<ApiResponse> GetUserApiTickets(string username);
     }
 }

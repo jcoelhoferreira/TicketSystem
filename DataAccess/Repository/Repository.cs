@@ -1,4 +1,5 @@
 ﻿using DataAccess.Entities;
+using DataAccess.Helpers;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,12 @@ namespace DataAccess.Repository
     public class Repository : IRepository
     {
         private readonly DataContext _dataContext;
+        private readonly IUserHelper _userHelper;
 
-        public Repository(DataContext dataContext)
+        public Repository(DataContext dataContext, IUserHelper userHelper)
         {
             _dataContext = dataContext;
+            _userHelper = userHelper;
         }
 
         public void AddTicket(Ticket ticket)
@@ -27,11 +30,18 @@ namespace DataAccess.Repository
             return _dataContext.Tickets.ToList();
         }
 
+        public IEnumerable<Ticket> GetTicketsUser(string username)
+        {
+            return _dataContext.Tickets
+                .Where(t => t.User.UserName == username)
+                .ToList();
+        }
+
         public IEnumerable<Ticket> GetAllWithUsers()
         {
-            return _dataContext.Tickets.
-                Include(t => t.User).
-                ToList();
+            return _dataContext.Tickets
+                .Include(t => t.User)
+                .ToList();
         }
 
         public Ticket GetTicket(int id)

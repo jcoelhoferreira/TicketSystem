@@ -8,20 +8,30 @@ namespace TicketModule
 {
     public class TicketsController : Controller
     {
-        private readonly IApiTicketService _apiService;
+        private readonly IApiTicketService _apiTicketService;
 
-        public TicketsController(IApiTicketService apiService)
+        public TicketsController(IApiTicketService apiTicketService)
         {
-            _apiService = apiService;
+            _apiTicketService = apiTicketService;
         }
 
         // GET: TicketsController
         public IActionResult Index()
         {
-            var result = _apiService.GetAllApiTickets().Result.Result;
+            var result = _apiTicketService.GetAllApiTickets().Result.Result;
 
             return View(result);
         }
+
+        // GET: TicketsController
+        public IActionResult IndexClient()
+        {
+            var user = TempData["username"].ToString();
+            var result = _apiTicketService.GetUserApiTickets(user).Result.Result;
+
+            return View(result);
+        }
+
 
         // GET: TicketsController/Details/5
         public ActionResult Details(int id)
@@ -44,7 +54,7 @@ namespace TicketModule
             {
                 try
                 {
-                    var result = await _apiService.CreateApiTicket(ticket);
+                    var result = await _apiTicketService.CreateApiTicket(ticket);
                     ViewBag.Message = result.Message;
                 }
                 catch (Exception e)
@@ -65,7 +75,7 @@ namespace TicketModule
                 return NotFound();
             }
 
-            var model = _apiService.GetApiTicket(id.Value).Result.Result;
+            var model = _apiTicketService.GetApiTicket(id.Value).Result.Result;
 
             return View(model);
         }

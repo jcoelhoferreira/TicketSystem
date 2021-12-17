@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using DataAccess;
 using DataAccess.Entities;
 using DataAccess.Repository;
+using TicketAPI.Services;
 
 namespace TicketAPI.Controllers
 {
@@ -16,10 +17,12 @@ namespace TicketAPI.Controllers
     public class TicketsController : ControllerBase
     {
         private readonly IRepository _repository;
+        private readonly IDecryption _decryption;
 
-        public TicketsController(IRepository repository)
+        public TicketsController(IRepository repository, IDecryption decryption)
         {
             _repository = repository;
+            _decryption = decryption;
         }
 
         // GET: api/Tickets
@@ -27,6 +30,22 @@ namespace TicketAPI.Controllers
         public ActionResult<IEnumerable<Ticket>> GetTickets()
         {
             return _repository.GetAllWithUsers().ToList();
+        }
+
+        // GET: api/Tickets/emailencriptado
+        [HttpGet("{username}/ticket")]
+        public ActionResult<IEnumerable<Ticket>> GetUserTickets(string username)
+        {
+            var decryptedUsername = _decryption.DecryptString(username);
+
+            var tickets = _repository.GetTicketsUser(decryptedUsername).ToList();
+
+            if(tickets == null)
+            {
+                return NotFound();
+            }
+
+            return tickets;
         }
 
         // GET: api/Tickets/5

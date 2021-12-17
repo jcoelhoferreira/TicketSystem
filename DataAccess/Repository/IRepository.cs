@@ -13,6 +13,7 @@ namespace DataAccess.Repository
         Ticket GetTicket(int id);
         IEnumerable<Ticket> GetAll();
         IEnumerable<Ticket> GetAllWithUsers();
+        IEnumerable<Ticket> GetTicketsUser(string username);
         void RemoveTicket(Ticket ticket);
         Task<bool> SaveAllAsync();
         void UpdateTicket(Ticket ticket);
