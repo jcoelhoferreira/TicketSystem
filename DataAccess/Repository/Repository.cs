@@ -12,12 +12,10 @@ namespace DataAccess.Repository
     public class Repository : IRepository
     {
         private readonly DataContext _dataContext;
-        private readonly IUserHelper _userHelper;
 
-        public Repository(DataContext dataContext, IUserHelper userHelper)
+        public Repository(DataContext dataContext)
         {
             _dataContext = dataContext;
-            _userHelper = userHelper;
         }
 
         public void AddTicket(Ticket ticket)

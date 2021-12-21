@@ -15,5 +15,8 @@ namespace DataAccess.Entities
 
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
+
+        [Display(Name = "Full Name")]
+        public string FullName => $"{FirstName} {LastName}";
     }
 }

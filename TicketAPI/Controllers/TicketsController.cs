@@ -9,6 +9,7 @@ using DataAccess;
 using DataAccess.Entities;
 using DataAccess.Repository;
 using TicketAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TicketAPI.Controllers
 {
@@ -27,6 +28,7 @@ namespace TicketAPI.Controllers
 
         // GET: api/Tickets
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public ActionResult<IEnumerable<Ticket>> GetTickets()
         {
             return _repository.GetAllWithUsers().ToList();
@@ -34,6 +36,7 @@ namespace TicketAPI.Controllers
 
         // GET: api/Tickets/emailencriptado
         [HttpGet("{username}/ticket")]
+        [Authorize(Roles = "Client")]
         public ActionResult<IEnumerable<Ticket>> GetUserTickets(string username)
         {
             var decryptedUsername = _decryption.DecryptString(username);

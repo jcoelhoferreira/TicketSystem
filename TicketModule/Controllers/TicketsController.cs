@@ -54,6 +54,7 @@ namespace TicketModule
             {
                 try
                 {
+                    ticket.UserName = TempData["username"].ToString();
                     var result = await _apiTicketService.CreateApiTicket(ticket);
                     ViewBag.Message = result.Message;
                 }

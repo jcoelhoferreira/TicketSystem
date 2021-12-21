@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace TicketModule.Services
 {
@@ -28,14 +29,14 @@ namespace TicketModule.Services
                 return new ApiResponse
                 {
                     IsSuccess = false,
-                    Message = result
+                    Message = "This Username already exists! Try with a different username!"
                 };
             }
 
             return new ApiResponse
             {
                 IsSuccess = true,
-                Message = "Your registration is complete, Check your email for more information."
+                Message = "Registration successful!"
             };
         }
 
@@ -57,13 +58,14 @@ namespace TicketModule.Services
                 };
             }
 
-            var userInfo = JsonConvert.DeserializeObject<UserResponseViewModel>(result);
+            //TODO: Não está a passar o formato corretamente
+            var token = new JwtSecurityToken(jwtEncodedString: result);
 
             return new ApiResponse
             {
                 IsSuccess = true,
-                Message = $"Welcome {userInfo.FirstName}!",
-                Result = userInfo
+                Message = "Hello World!",
+                Result = token
             };
         }
     }

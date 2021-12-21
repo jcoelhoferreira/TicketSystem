@@ -87,17 +87,17 @@ namespace DataAccess
             {
                 AddTicket("Não consigo fazer login",
                     "Não consigo fazer login na aplicação." +
-                    " Gostava que me ajudassem o mais ráido possível",
+                    " Gostava que me ajudassem o mais rápido possível",
                     false,
                     user2);
                 AddTicket("O bluetooth não funciona",
                     "Não consigo sincronizar os aparelhos." +
-                    " Gostava que me ajudassem o mais ráido possível",
+                    " Gostava que me ajudassem o mais rápido possível",
                     false,
                     user2);
                 AddTicket("A aplicação crasha no arranque",
                     "A aplicação não arranca." +
-                    " Gostava que me ajudassem o mais ráido possível",
+                    " Gostava que me ajudassem o mais rápido possível",
                     false,
                     user2);
                 await _dataContext.SaveChangesAsync();

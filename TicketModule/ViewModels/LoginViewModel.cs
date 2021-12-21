@@ -9,12 +9,14 @@ namespace TicketModule.ViewModels
 {
     public class LoginViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Username is required")]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Password is required")]
         [MinLength(6)]
         public string Password { get; set; }
+
         public bool RememberMe { get; set; }
     }
 }

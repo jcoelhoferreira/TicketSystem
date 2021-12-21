@@ -9,19 +9,23 @@ namespace TicketModule.ViewModels
 {
     public class RegisterViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "First name is required")]
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Last name is required")]
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Email is required")]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Password is required")]
         [MinLength(6)]
         public string Password { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Confirm password is required.")]
         [Compare("Password")]
         public string ConfirmPassword { get; set; }
 

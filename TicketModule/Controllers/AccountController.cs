@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using TicketModule.Services;
 using TicketModule.ViewModels;
 
@@ -15,49 +16,6 @@ namespace TicketModule
             _apiUserService = apiUserService;
             _encryption = encryption;
         }
-
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                model.Email = _encryption.EncryptString(model.Email);
-                model.Password = _encryption.EncryptString(model.Password);
-                try
-                {
-                    var result = await _apiUserService.LoginAsync(model);
-                    if (result.IsSuccess)
-                    {
-                        var user = (UserResponseViewModel)result.Result;
-
-                        if(user.Role == "Client")
-                        {
-                            var username = _encryption.EncryptString(user.UserName);
-                            TempData["username"] = username;
-                            return RedirectToAction("IndexClient", "Tickets");
-                        }
-
-                        ViewBag.Message = result.Message;
-                        return RedirectToAction("Index","Home");
-                    }
-                    
-                }
-                catch (Exception e)
-                {
-                    ViewBag.Message = e.Message.ToString();
-                }
-            }
-
-            this.ModelState.AddModelError(string.Empty, "Failed to login!");
-            return View();
-        }
-
 
         public IActionResult Register()
         {
@@ -84,6 +42,49 @@ namespace TicketModule
                 return View();
             }
             ViewBag.Error = "Invalid values, please try again.";
+            return View();
+        }
+
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.Email = _encryption.EncryptString(model.Email);
+                model.Password = _encryption.EncryptString(model.Password);
+                try
+                {
+                    var result = await _apiUserService.LoginAsync(model);
+                    if (result.IsSuccess)
+                    {
+                        var token = (JwtSecurityToken)result.Result;
+                        var userRole = token.Claims.First(c => c.Type == "Role").Value;
+
+                        if (userRole == "Client")
+                        {
+                            return RedirectToAction("IndexClient", "Tickets");
+                        }
+
+                        return RedirectToAction("Index", "Tickets");
+
+                        ViewBag.Message = result.Message;
+                        return RedirectToAction("Index","Home");
+                    }
+                    
+                }
+                catch (Exception e)
+                {
+                    ViewBag.Message = e.Message.ToString();
+                }
+            }
+
+            this.ModelState.AddModelError(string.Empty, "Failed to login!");
             return View();
         }
 
