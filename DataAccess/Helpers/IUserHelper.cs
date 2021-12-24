@@ -11,15 +11,18 @@ namespace DataAccess.Helpers
 {
      public interface IUserHelper
     {
-        Task<User> GetUserByEmailAsync(string email);
-        Task<IdentityResult> AddUserAsync(User user, string password);
-        Task CheckRoleAsync(string roleName);
-        Task<string> GetRoleAsync(User user);
-        Task AddUserToRoleAsync(User user, string roleName);
-        Task<bool> IsUserInRoleAsync(User user, string roleName);
-        Task<SignInResult> LoginAsync(LoginViewModel model);
-        Task LogoutAsync();
-        Task<SignInResult> ValidatePasswordAsync(User user, string password);
+        Task<UserInfo> GetUserByEmailAsync(string email);
+        void AddUserAsync(UserInfo user);
+        Task<bool> SaveAllAsync();
+        IEnumerable<UserInfo> GetAll();
+        Task<UserInfo> GetUser(string username, string pass);
+        //Task CheckRoleAsync(string roleName);
+        //Task<string> GetRoleAsync(User user);
+        //Task AddUserToRoleAsync(User user, string roleName);
+        //Task<bool> IsUserInRoleAsync(User user, string roleName);
+        //Task<SignInResult> LoginAsync(LoginViewModel model);
+        //Task LogoutAsync();
+        //Task<SignInResult> ValidatePasswordAsync(User user, string password);
 
     }
 }

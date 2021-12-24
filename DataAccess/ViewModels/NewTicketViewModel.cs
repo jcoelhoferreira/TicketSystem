@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TicketModule.ViewModels
+namespace DataAccess.ViewModels
 {
     public class NewTicketViewModel
     {

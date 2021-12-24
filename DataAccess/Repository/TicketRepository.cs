@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repository
 {
-    public class Repository : IRepository
+    public class TicketRepository : ITicketRepository
     {
         private readonly DataContext _dataContext;
 
-        public Repository(DataContext dataContext)
+        public TicketRepository(DataContext dataContext)
         {
             _dataContext = dataContext;
         }
@@ -28,17 +28,11 @@ namespace DataAccess.Repository
             return _dataContext.Tickets.ToList();
         }
 
-        public IEnumerable<Ticket> GetTicketsUser(string username)
-        {
-            return _dataContext.Tickets
-                .Where(t => t.User.UserName == username)
-                .ToList();
-        }
-
         public IEnumerable<Ticket> GetAllWithUsers()
         {
             return _dataContext.Tickets
-                .Include(t => t.User)
+                //.Include(t => t.UserInfo.FullName)
+                //.Include(t => t.UserInfo.Username)
                 .ToList();
         }
 

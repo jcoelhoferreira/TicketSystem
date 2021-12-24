@@ -7,13 +7,12 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repository
 {
-    public interface IRepository
+    public interface ITicketRepository
     {
         void AddTicket(Ticket ticket);
         Ticket GetTicket(int id);
         IEnumerable<Ticket> GetAll();
         IEnumerable<Ticket> GetAllWithUsers();
-        IEnumerable<Ticket> GetTicketsUser(string username);
         void RemoveTicket(Ticket ticket);
         Task<bool> SaveAllAsync();
         void UpdateTicket(Ticket ticket);

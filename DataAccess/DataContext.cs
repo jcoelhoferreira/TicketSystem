@@ -9,13 +9,15 @@ using System.Threading.Tasks;
 
 namespace DataAccess
 {
-    public class DataContext : IdentityDbContext<User>
+    public class DataContext : DbContext
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
 
         }
 
-        public DbSet<Ticket> Tickets { get; set; }
+        public virtual DbSet<UserInfo> UsersInfo { get; set; }
+
+        public virtual DbSet<Ticket> Tickets { get; set; }
     }
 }

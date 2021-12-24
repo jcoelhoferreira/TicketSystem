@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,20 +10,21 @@ using System.Threading.Tasks;
 using TicketModule.Models;
 using TicketModule.ViewModels;
 
-namespace TicketModule.Services
+namespace TicketModule.Services.API
 {
     public class ApiTicketService : IApiTicketService
     {
-        private string baseUrl = "https://localhost:7249/api/";
+        private static string baseUrl = "https://localhost:7249/api/";
 
-        public async Task<ApiResponse> GetUserApiTickets(string username)
+        public async Task<ApiResponse> GetAllTickets(string accessToken)
         {
             try
             {
                 var client = new HttpClient();
                 client.BaseAddress = new Uri(baseUrl);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-                var response = await client.GetAsync("Tickets/" + username + "/ticket");
+                var response = await client.GetAsync("Tickets");
                 var result = await response.Content.ReadAsStringAsync();
 
                 if (!response.IsSuccessStatusCode)
@@ -34,9 +36,10 @@ namespace TicketModule.Services
                     };
                 }
 
-                var apiInfo = JsonConvert.DeserializeObject<List<Ticket>>(result);
+                var tickets = JsonConvert.DeserializeObject<List<Ticket>>(result).ToList();
 
-                if (apiInfo.Count == 0)
+
+                if (tickets.Count == 0)
                 {
                     return new ApiResponse
                     {
@@ -48,8 +51,9 @@ namespace TicketModule.Services
                 return new ApiResponse
                 {
                     IsSuccess = true,
-                    Result = apiInfo
+                    Result = tickets
                 };
+
             }
             catch (Exception e)
             {
@@ -61,12 +65,11 @@ namespace TicketModule.Services
             }
         }
 
-        
-
-        public async Task<ApiResponse> CreateApiTicket(NewTicketViewModel ticket)
+        public async Task<ApiResponse> CreateApiTicket(NewTicketViewModel ticket, string accessToken)
         {
             var client = new HttpClient();
             client.BaseAddress = new Uri(baseUrl);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             var response = client.PostAsJsonAsync("Tickets", ticket).Result;
@@ -96,52 +99,6 @@ namespace TicketModule.Services
         public Task<ApiResponse> EditApiTicket(Ticket ticket)
         {
             throw new NotImplementedException();
-        }
-
-        public async Task<ApiResponse> GetAllApiTickets()
-        {
-            try
-            {
-                var client = new HttpClient();
-                client.BaseAddress = new Uri(baseUrl);
-
-                var response = await client.GetAsync("Tickets");
-                var result = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return new ApiResponse
-                    {
-                        IsSuccess = false,
-                        Message = result
-                    };
-                }
-
-                var apiInfo = JsonConvert.DeserializeObject<List<Ticket>>(result);
-
-                if (apiInfo.Count == 0)
-                {
-                    return new ApiResponse
-                    {
-                        IsSuccess = false,
-                        Message = result
-                    };
-                }
-
-                return new ApiResponse
-                {
-                    IsSuccess = true,
-                    Result = apiInfo
-                };
-            }
-            catch (Exception e)
-            {
-                return new ApiResponse
-                {
-                    IsSuccess = false,
-                    Message = e.Message
-                };
-            }
         }
 
         public async Task<ApiResponse> GetApiTicket(int id)

@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TicketModule.Services.API;
 using TicketModule.Services;
+using Microsoft.AspNetCore.Builder;
 
 namespace TicketModule
 {
@@ -16,7 +18,15 @@ namespace TicketModule
             services.AddScoped<IApiTicketService, ApiTicketService>();
             services.AddScoped<IApiUserService, ApiUserService>();
             services.AddScoped<IEncryption, Encryption>();
+            services.AddSession(cfg =>
+            {
+                cfg.IdleTimeout = TimeSpan.FromMinutes(20);
+            });
         }
-        
+
+        public void Configure(IApplicationBuilder app)
+        {
+            app.UseSession();
+        }
     }
 }

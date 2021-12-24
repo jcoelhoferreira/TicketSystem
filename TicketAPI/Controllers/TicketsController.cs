@@ -10,52 +10,41 @@ using DataAccess.Entities;
 using DataAccess.Repository;
 using TicketAPI.Services;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using DataAccess.ViewModels;
 
 namespace TicketAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TicketsController : ControllerBase
     {
-        private readonly IRepository _repository;
-        private readonly IDecryption _decryption;
+        private readonly ITicketRepository _ticketRepository;
+        private readonly DataContext _dataContext;
 
-        public TicketsController(IRepository repository, IDecryption decryption)
+        public TicketsController(ITicketRepository ticketRepository, DataContext dataContext)
         {
-            _repository = repository;
-            _decryption = decryption;
+            _ticketRepository = ticketRepository;
+            _dataContext = dataContext;
         }
 
         // GET: api/Tickets
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         public ActionResult<IEnumerable<Ticket>> GetTickets()
         {
-            return _repository.GetAllWithUsers().ToList();
-        }
-
-        // GET: api/Tickets/emailencriptado
-        [HttpGet("{username}/ticket")]
-        [Authorize(Roles = "Client")]
-        public ActionResult<IEnumerable<Ticket>> GetUserTickets(string username)
-        {
-            var decryptedUsername = _decryption.DecryptString(username);
-
-            var tickets = _repository.GetTicketsUser(decryptedUsername).ToList();
-
-            if(tickets == null)
+            if(User.FindFirstValue(ClaimTypes.Role) != "Admin")
             {
-                return NotFound();
+                return Unauthorized();
             }
-
-            return tickets;
+            return _ticketRepository.GetAllWithUsers().ToList();
         }
 
         // GET: api/Tickets/5
         [HttpGet("{id}")]
         public ActionResult<Ticket> GetTicket(int id)
         {
-            var ticket = _repository.GetTicket(id);
+            var ticket = _ticketRepository.GetTicket(id);
 
             if (ticket == null)
             {
@@ -77,8 +66,8 @@ namespace TicketAPI.Controllers
 
             try
             {
-                _repository.UpdateTicket(ticket);
-                await _repository.SaveAllAsync();
+                _ticketRepository.UpdateTicket(ticket);
+                await _ticketRepository.SaveAllAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -98,33 +87,44 @@ namespace TicketAPI.Controllers
         // POST: api/Tickets
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Ticket>> PostTicket(Ticket ticket)
+        public async Task<ActionResult<Ticket>> PostTicket(NewTicketViewModel modelTicket)
         {
-            _repository.AddTicket(ticket);
-            await _repository.SaveAllAsync();
+            var user = User.Identity.Name;
+            var client = await _dataContext.UsersInfo.FirstOrDefaultAsync(u => u.Username == user);
 
-            return CreatedAtAction("GetTicket", new { id = ticket.Id }, ticket);
+            var newTicket = new Ticket
+            {
+                Title = modelTicket.Title,
+                Description = modelTicket.Description,
+                UserInfo = client
+            };
+
+            _ticketRepository.AddTicket(newTicket);
+            await _ticketRepository.SaveAllAsync();
+
+            return Ok();
+            /*return CreatedAtAction("GetTickets", new { id = newTicket.Id }, newTicket)*/;
         }
 
         // DELETE: api/Tickets/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTicket(int id)
         {
-            var ticket = _repository.GetTicket(id);
+            var ticket = _ticketRepository.GetTicket(id);
             if (ticket == null)
             {
                 return NotFound();
             }
 
-            _repository.RemoveTicket(ticket);
-            await _repository.SaveAllAsync();
+            _ticketRepository.RemoveTicket(ticket);
+            await _ticketRepository.SaveAllAsync();
 
             return NoContent();
         }
 
         private bool TicketExists(int id)
         {
-            return _repository.TicketExists(id);
+            return _ticketRepository.TicketExists(id);
         }
     }
 }

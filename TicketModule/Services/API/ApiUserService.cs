@@ -8,8 +8,9 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
+using TicketModule.Models;
 
-namespace TicketModule.Services
+namespace TicketModule.Services.API
 {
     public class ApiUserService : IApiUserService
     {
@@ -40,33 +41,43 @@ namespace TicketModule.Services
             };
         }
 
-        public async Task<ApiResponse> LoginAsync(LoginViewModel model)
+        public async Task<ApiResponse> LoginUserAsync(LoginViewModel userInfo)
         {
-            var client = new HttpClient();
-            client.BaseAddress = new Uri(baseUrl);
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            try
+            {
+                var client = new HttpClient();
+                client.BaseAddress = new Uri(baseUrl);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var response = client.PostAsJsonAsync("Account/Login", model).Result;
-            var result = await response.Content.ReadAsStringAsync();
+                var response = client.PostAsJsonAsync("Token", userInfo).Result;
+                string token = await response.Content.ReadAsStringAsync();
 
-            if (!response.IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Message = token
+                    };
+                }
+
+                token = token.Substring(1, token.Length - 2);
+
+                return new ApiResponse
+                {
+                    IsSuccess = true,
+                    Message = token
+                };
+                    
+            }
+            catch (Exception e)
             {
                 return new ApiResponse
                 {
                     IsSuccess = false,
-                    Message = result
+                    Message = e.Message
                 };
             }
-
-            //TODO: Não está a passar o formato corretamente
-            var token = new JwtSecurityToken(jwtEncodedString: result);
-
-            return new ApiResponse
-            {
-                IsSuccess = true,
-                Message = "Hello World!",
-                Result = token
-            };
         }
     }
 }

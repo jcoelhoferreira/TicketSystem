@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
+using TicketModule.Models;
 using TicketModule.Services;
+using TicketModule.Services.API;
 using TicketModule.ViewModels;
 
 namespace TicketModule
@@ -15,6 +17,11 @@ namespace TicketModule
         {
             _apiUserService = apiUserService;
             _encryption = encryption;
+        }
+
+        public IActionResult Index()
+        {
+            return View();
         }
 
         public IActionResult Register()
@@ -51,41 +58,28 @@ namespace TicketModule
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login(LoginViewModel userInfo)
         {
             if (ModelState.IsValid)
             {
-                model.Email = _encryption.EncryptString(model.Email);
-                model.Password = _encryption.EncryptString(model.Password);
-                try
+                var result = await _apiUserService.LoginUserAsync(userInfo);
+
+                if (!result.IsSuccess)
                 {
-                    var result = await _apiUserService.LoginAsync(model);
-                    if (result.IsSuccess)
-                    {
-                        var token = (JwtSecurityToken)result.Result;
-                        var userRole = token.Claims.First(c => c.Type == "Role").Value;
-
-                        if (userRole == "Client")
-                        {
-                            return RedirectToAction("IndexClient", "Tickets");
-                        }
-
-                        return RedirectToAction("Index", "Tickets");
-
-                        ViewBag.Message = result.Message;
-                        return RedirectToAction("Index","Home");
-                    }
-                    
+                    ViewBag.Message = "Incorrect Username or Password";
+                    return RedirectToAction("Index", "Home");
+                    //return Redirect("~/Home/Index");
                 }
-                catch (Exception e)
-                {
-                    ViewBag.Message = e.Message.ToString();
-                }
+                var token = result.Message;
+                HttpContext.Session.SetString("JWToken", token);
             }
+            return Redirect("~/Account/Index");
+        }
 
-            this.ModelState.AddModelError(string.Empty, "Failed to login!");
-            return View();
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
         }
 
         //// GET: TicketsController/Edit/5

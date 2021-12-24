@@ -1,4 +1,4 @@
-﻿namespace TicketModule.Services
+﻿namespace TicketModule.Services.API
 {
     public class ApiResponse
     {

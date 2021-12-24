@@ -1,14 +1,7 @@
-﻿using DataAccess.Entities;
-using DataAccess.Helpers;
-using DataAccess.ViewModels;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using DataAccess;
+using DataAccess.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using TicketAPI.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace TicketAPI.Controllers
 {
@@ -16,113 +9,101 @@ namespace TicketAPI.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly IUserHelper _userHelper;
-        private readonly IDecryption _decrypton;
-        private readonly IConfiguration _configuration;
+        private readonly DataContext _context;
 
-        public AccountController(IUserHelper userHelper, IDecryption decrypton, IConfiguration configuration)
+        public AccountController(DataContext context)
         {
-            _userHelper = userHelper;
-            _decrypton = decrypton;
-            _configuration = configuration;
+            _context = context;
         }
 
-        // POST: api/Account/Register
-        [HttpPost("register")]
-        public async Task<IActionResult> CreateUser(RegisterViewModel model)
+        // GET: api/UsersInfo
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserInfo>>> GetUserInfo()
         {
-            var email = _decrypton.DecryptString(model.Email);
-            var user = await _userHelper.GetUserByEmailAsync(email);
-
-            if(user == null)
-            {
-                user = new User
-                {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Email = email,
-                    UserName = email,
-                };
-
-                var password = _decrypton.DecryptString(model.Password);
-                var result = await _userHelper.AddUserAsync(user, password);
-
-                await _userHelper.CheckRoleAsync("Client");
-                await _userHelper.AddUserToRoleAsync(user, "Client");
-
-                if (result != IdentityResult.Success)
-                {
-                    return BadRequest();
-                }
-
-                return Ok();
-            }
-
-            return BadRequest();
+            return await _context.UsersInfo.ToListAsync();
         }
 
-        // POST: api/Account/Login
-        [HttpPost("login")]
-        public async Task<IActionResult> LoginUser(LoginViewModel model)
+        // GET: api/UsersInfo/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserInfo>> GetUserInfo(int? id)
         {
-            var userInfo = new LoginViewModel
-            {
-                Email = _decrypton.DecryptString(model.Email),
-                Password = _decrypton.DecryptString(model.Password),
-                RememberMe = model.RememberMe
-            };
-
-            var user = await _userHelper.GetUserByEmailAsync(userInfo.Email);
-
-            if(user == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var result = await _userHelper.LoginAsync(userInfo);
-
-            if (result.Succeeded)
+            var product = await _context.UsersInfo
+                .FindAsync(id);
+            if (product == null)
             {
-                string token = await CreateToken(user);
-                return Ok(token);
-                //var userResponse = new UserResponseViewModel
-                //{
-                //    FirstName = user.FirstName,
-                //    UserName = user.UserName,
-                //    Role = _userHelper.GetRoleAsync(user).Result
-                //};
-
-                //return Ok(userResponse);
+                return NotFound();
             }
 
-            return Unauthorized();
+            return product;
         }
 
-        private async Task<string> CreateToken(User user)
+        // PUT: api/UsersInfo/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutUserInfo(int id, UserInfo userInfo)
         {
-            var userRole = await _userHelper.GetRoleAsync(user);
-
-            var authClaims = new List<Claim>
+            if (id != userInfo.Id)
             {
-                new Claim(ClaimTypes.Name, user.FullName),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, userRole)
-            };
+                return BadRequest();
+            }
 
-            var authSigninKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
+            _context.Entry(userInfo).State = EntityState.Modified;
 
-            var token = new JwtSecurityToken(
-                    issuer: _configuration["Tokens:Issuer"],
-                    audience: _configuration["Tokens:Audience"],
-                    expires: DateTime.Now.AddHours(24),
-                    claims: authClaims,
-                    signingCredentials: new SigningCredentials(authSigninKey, SecurityAlgorithms.HmacSha256)
-                );
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserInfoExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            return NoContent();
+        }
 
-            return jwt;
+        // POST: api/UsersInfo
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<UserInfo>> PostUserInfo(UserInfo userInfo)
+        {
+            _context.UsersInfo.Add(userInfo);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetUserInfo", new { id = userInfo.Id }, userInfo);
+        }
+
+
+        // POST: UsersInfo/Delete/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<UserInfo>> DeleteUserInfo(int id)
+        {
+            var userInfo = await _context.UsersInfo.FindAsync(id);
+            if (userInfo == null)
+            {
+                return NotFound();
+            }
+
+            _context.UsersInfo.Remove(userInfo);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool UserInfoExists(int id)
+        {
+            return _context.UsersInfo.Any(e => e.Id == id);
         }
     }
 }

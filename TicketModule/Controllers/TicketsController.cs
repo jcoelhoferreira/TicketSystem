@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TicketModule.Models;
-using TicketModule.Services;
+using TicketModule.Services.API;
 using TicketModule.ViewModels;
 
 namespace TicketModule
@@ -18,18 +18,13 @@ namespace TicketModule
         // GET: TicketsController
         public IActionResult Index()
         {
-            var result = _apiTicketService.GetAllApiTickets().Result.Result;
-
-            return View(result);
-        }
-
-        // GET: TicketsController
-        public IActionResult IndexClient()
-        {
-            var user = TempData["username"].ToString();
-            var result = _apiTicketService.GetUserApiTickets(user).Result.Result;
-
-            return View(result);
+            var accessToken = HttpContext.Session.GetString("JWToken");
+            if(accessToken != null)
+            {
+                var tickets = (List<Ticket>)_apiTicketService.GetAllTickets(accessToken).Result.Result;
+                return View(tickets);
+            }
+            return View();
         }
 
 
@@ -54,9 +49,12 @@ namespace TicketModule
             {
                 try
                 {
-                    ticket.UserName = TempData["username"].ToString();
-                    var result = await _apiTicketService.CreateApiTicket(ticket);
-                    ViewBag.Message = result.Message;
+                    var accessToken = HttpContext.Session.GetString("JWToken");
+                    if (accessToken != null)
+                    {
+                        var result = await _apiTicketService.CreateApiTicket(ticket, accessToken);
+                        ViewBag.Message = result.Message;
+                    }
                 }
                 catch (Exception e)
                 {

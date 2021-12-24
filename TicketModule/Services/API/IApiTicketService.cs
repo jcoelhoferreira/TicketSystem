@@ -6,15 +6,14 @@ using System.Threading.Tasks;
 using TicketModule.Models;
 using TicketModule.ViewModels;
 
-namespace TicketModule.Services
+namespace TicketModule.Services.API
 {
     public interface IApiTicketService
     {
-        Task<ApiResponse> GetAllApiTickets();
+        Task<ApiResponse> GetAllTickets(string accessToken);
         Task<ApiResponse> GetApiTicket(int id);
-        Task<ApiResponse> CreateApiTicket(NewTicketViewModel ticket);
+        Task<ApiResponse> CreateApiTicket(NewTicketViewModel ticket, string accessToken);
         Task<ApiResponse> EditApiTicket(Ticket ticket);
         Task<ApiResponse> DeleteApiTicket(int id);
-        Task<ApiResponse> GetUserApiTickets(string username);
     }
 }

@@ -15,9 +15,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(cfg =>
+{
+    cfg.JsonSerializerOptions.PropertyNamingPolicy = null;
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(cfg =>
 {
     cfg.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
@@ -35,43 +40,25 @@ builder.Services.AddDbContext<DataContext>(cfg =>
     cfg.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddIdentity<User, IdentityRole>(cfg =>
-{
-    cfg.User.RequireUniqueEmail = true;
-    cfg.Password.RequireDigit = false;
-    cfg.Password.RequiredUniqueChars = 0;
-    cfg.Password.RequireUppercase = false;
-    cfg.Password.RequireLowercase = false;
-    cfg.Password.RequireNonAlphanumeric = false;
-    cfg.Password.RequiredLength = 6;
-})
-  .AddEntityFrameworkStores<DataContext>()
-  .AddDefaultTokenProviders();
-
-builder.Services.AddAuthentication(auth =>
-{
-    auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(cfg =>
-{
-    cfg.SaveToken = true;
-    cfg.RequireHttpsMetadata = false;
-    cfg.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(cfg =>
     {
-        ValidateIssuerSigningKey = true,
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidIssuer = builder.Configuration["Tokens:Issuer"],
-        ValidAudience = builder.Configuration["Tokens:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Tokens:Key"]))
-    };
-});
+        cfg.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Tokens:Issuer"],
+            ValidAudience = builder.Configuration["Tokens:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Tokens:Key"]))
+        };
+    }); 
 builder.Services.AddAuthorization();
 
 builder.Services.AddTransient<SeedDb>();
 builder.Services.AddScoped<IUserHelper, UserHelper>();
-builder.Services.AddScoped<IRepository, Repository>();
+builder.Services.AddScoped<ITicketRepository, TicketRepository>();
 builder.Services.AddScoped<IDecryption, Decryption>();
 
 var app = builder.Build();

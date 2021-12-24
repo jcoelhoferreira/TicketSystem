@@ -24,62 +24,40 @@ namespace DataAccess
         {
             await _dataContext.Database.EnsureCreatedAsync();
 
-            await _userHelper.CheckRoleAsync("Admin");
-            await _userHelper.CheckRoleAsync("Client");
 
             var user = await _userHelper.GetUserByEmailAsync("ticketsadmin@yopmail.com");
             var user2 = await _userHelper.GetUserByEmailAsync("luisclient@yopmail.com");
-            
+
             //add user admin
             if (user == null)
             {
-                user = new User
+                user = new UserInfo
                 {
                     FirstName = "Fernando",
                     LastName = "Pessoa",
-                    UserName = "ticketsadmin@yopmail.com",
-                    Email = "ticketsadmin@yopmail.com"
+                    Username = "ticketsadmin@yopmail.com",
+                    Role = "Admin",
+                    Password = "123456"
                 };
 
-                var result = await _userHelper.AddUserAsync(user, "123456");
-                if (result != IdentityResult.Success)
-                {
-                    throw new InvalidOperationException("Could not create the user in seeder");
-                }
-
-                await _userHelper.AddUserToRoleAsync(user, "Admin");
-            }
-
-            var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin");
-            if (!isInRole)
-            {
-                await _userHelper.AddUserToRoleAsync(user, "Admin");
+                _userHelper.AddUserAsync(user);
+                await _userHelper.SaveAllAsync();
             }
 
             //add user client
             if (user2 == null)
             {
-                user2 = new User
+                user2 = new UserInfo
                 {
                     FirstName = "Luis",
                     LastName = "Camoes",
-                    UserName = "luisclient@yopmail.com",
-                    Email = "luisclient@yopmail.com"
+                    Username = "luisclient@yopmail.com",
+                    Role = "Client",
+                    Password = "123456"
                 };
 
-                var result2 = await _userHelper.AddUserAsync(user2, "123456");
-                if (result2 != IdentityResult.Success)
-                {
-                    throw new InvalidOperationException("Could not create the user in seeder");
-                }
-
-                await _userHelper.AddUserToRoleAsync(user2, "Client");
-            }
-
-            var isInRole2 = await _userHelper.IsUserInRoleAsync(user2, "Client");
-            if (!isInRole2)
-            {
-                await _userHelper.AddUserToRoleAsync(user2, "Client");
+                _userHelper.AddUserAsync(user2);
+                await _userHelper.SaveAllAsync();
             }
 
             //add tickets
@@ -104,14 +82,14 @@ namespace DataAccess
             }
         }
 
-        private void AddTicket(string title, string description, bool isSolved, User user)
+        private void AddTicket(string title, string description, bool isSolved, UserInfo user)
         {
             _dataContext.Tickets.Add(new Ticket
             {
                 Title = title,
                 Description = description,
                 IsSolved = isSolved,
-                User = user
+                UserInfo = user
             });
         }
     }
