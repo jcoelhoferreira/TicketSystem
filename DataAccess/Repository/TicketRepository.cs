@@ -31,8 +31,7 @@ namespace DataAccess.Repository
         public IEnumerable<Ticket> GetAllWithUsers()
         {
             return _dataContext.Tickets
-                //.Include(t => t.UserInfo.FullName)
-                //.Include(t => t.UserInfo.Username)
+                .Include(t => t.UserInfo)
                 .ToList();
         }
 

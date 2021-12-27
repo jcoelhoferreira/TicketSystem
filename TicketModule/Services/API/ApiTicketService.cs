@@ -65,6 +65,54 @@ namespace TicketModule.Services.API
             }
         }
 
+        public async Task<ApiResponse> GetApiTicket(int id, string accessToken)
+        {
+            try
+            {
+                var client = new HttpClient();
+                client.BaseAddress = new Uri(baseUrl);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                var response = await client.GetAsync("Tickets/" + id);
+                var result = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Message = result
+                    };
+                }
+
+                var ticket = JsonConvert.DeserializeObject<Ticket>(result);
+
+                if (ticket == null)
+                {
+                    return new ApiResponse
+                    {
+                        IsSuccess = false,
+                        Message = result
+                    };
+                }
+
+                return new ApiResponse
+                {
+                    IsSuccess = true,
+                    Result = ticket
+                };
+
+            }
+            catch (Exception e)
+            {
+                return new ApiResponse
+                {
+                    IsSuccess = false,
+                    Message = e.Message
+                };
+            }
+        }
+
         public async Task<ApiResponse> CreateApiTicket(NewTicketViewModel ticket, string accessToken)
         {
             var client = new HttpClient();
@@ -96,53 +144,31 @@ namespace TicketModule.Services.API
             throw new NotImplementedException();
         }
 
-        public Task<ApiResponse> EditApiTicket(Ticket ticket)
+        public async Task<ApiResponse> EditApiTicket(int id, TicketViewModel model, string accessToken)
         {
-            throw new NotImplementedException();
-        }
+            var client = new HttpClient();
+            client.BaseAddress = new Uri(baseUrl);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        public async Task<ApiResponse> GetApiTicket(int id)
-        {
-            try
+            var response = client.PutAsJsonAsync("Tickets/" + id, model).Result;
+            var result = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
             {
-                var client = new HttpClient();
-                client.BaseAddress = new Uri(baseUrl);
-
-                var response = await client.GetAsync("Tickets/" + id);
-                var result = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    return new ApiResponse
-                    {
-                        IsSuccess = false,
-                        Message = result
-                    };
-                }
-
-                var apiInfo = JsonConvert.DeserializeObject<Ticket>(result);
-
-                if (apiInfo == null)
-                {
-                    return new ApiResponse
-                    {
-                        IsSuccess = false,
-                        Message = result
-                    };
-                }
-
                 return new ApiResponse
                 {
-                    IsSuccess = true,
-                    Result = apiInfo
+                    IsSuccess = false,
+                    Message = result
                 };
-
             }
-            catch (Exception)
+
+            return new ApiResponse
             {
+                IsSuccess = true,
+                Message = "Your ticket was submitted successfuly. Our team is working on your issue!"
+            };
 
-                throw;
-            }
         }
     }
 }

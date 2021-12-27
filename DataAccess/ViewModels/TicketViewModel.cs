@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TicketModule.Models
+namespace DataAccess.ViewModels
 {
-    public class Ticket
+    public class TicketViewModel
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -21,7 +21,5 @@ namespace TicketModule.Models
         public string? Resolution { get; set; }
 
         public bool IsSolved { get; set; }
-
-        public UserInfo ?UserInfo { get; set; }
     }
 }

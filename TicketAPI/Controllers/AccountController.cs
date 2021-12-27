@@ -1,5 +1,6 @@
 ﻿using DataAccess;
 using DataAccess.Entities;
+using DataAccess.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -76,12 +77,21 @@ namespace TicketAPI.Controllers
         // POST: api/UsersInfo
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<UserInfo>> PostUserInfo(UserInfo userInfo)
+        public async Task<IActionResult> PostUserInfo(RegisterViewModel userInfo)
         {
-            _context.UsersInfo.Add(userInfo);
+            var user = new UserInfo
+            {
+                FirstName = userInfo.FirstName,
+                LastName = userInfo.LastName,
+                Username = userInfo.Email,
+                Password = userInfo.Password,
+                Role = "Client"
+                
+            };
+            _context.UsersInfo.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUserInfo", new { id = userInfo.Id }, userInfo);
+            return Ok();
         }
 
 

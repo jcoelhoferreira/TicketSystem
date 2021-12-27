@@ -19,19 +19,41 @@ namespace TicketModule
         public IActionResult Index()
         {
             var accessToken = HttpContext.Session.GetString("JWToken");
+
             if(accessToken != null)
             {
-                var tickets = (List<Ticket>)_apiTicketService.GetAllTickets(accessToken).Result.Result;
-                return View(tickets);
+                var result = _apiTicketService.GetAllTickets(accessToken).Result;
+
+                if (result.IsSuccess)
+                {
+                    var tickets = (List<Ticket>)result.Result;
+                    return View(tickets);
+                }
+
+                //return View();
             }
-            return View();
+            return RedirectToAction("Login", "Account");
         }
 
 
         // GET: TicketsController/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(int? id)
         {
-            return View();
+            if(id == null)
+            {
+                return NotFound();
+            }
+            var accessToken = HttpContext.Session.GetString("JWToken");
+            if (accessToken != null)
+            {
+                var ticket = _apiTicketService.GetApiTicket(id.Value, accessToken).Result.Result;
+                if (ticket != null)
+                {
+                    return View(ticket);
+                }
+                return NotFound();
+            }
+            return RedirectToAction("Index");
         }
 
         // GET: TicketsController/Create
@@ -69,29 +91,53 @@ namespace TicketModule
         // GET: TicketsController/Edit/5
         public IActionResult Edit(int? id)
         {
-            if(id == null)
+            if (id == null)
             {
                 return NotFound();
             }
+            var accessToken = HttpContext.Session.GetString("JWToken");
+            if(accessToken != null)
+            {
+                var ticket = (Ticket)_apiTicketService.GetApiTicket(id.Value, accessToken).Result.Result;
 
-            var model = _apiTicketService.GetApiTicket(id.Value).Result.Result;
+                var model = new TicketViewModel
+                {
+                    Id = ticket.Id,
+                    Title = ticket.Title,
+                    Description = ticket.Description,
+                    Resolution = ticket.Resolution,
+                    IsSolved = ticket.IsSolved,
+                };
 
-            return View(model);
+                return View(model);
+            }
+            return RedirectToAction("Index");
         }
 
         // POST: TicketsController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(TicketViewModel model)
         {
-            try
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    var accessToken = HttpContext.Session.GetString("JWToken");
+                    if (accessToken != null)
+                    {
+                        var result = await _apiTicketService.EditApiTicket(model.Id, model, accessToken);
+                        ViewBag.Message = result.Message;
+                    }
+                }
+                catch (Exception e)
+                {
+                    ViewBag.Message = e.Message.ToString();
+                }
+                return RedirectToAction("Index");
             }
-            catch
-            {
-                return View();
-            }
+            ViewBag.Error = "Invalid values, please try again.";
+            return View();
         }
 
         // GET: TicketsController/Delete/5

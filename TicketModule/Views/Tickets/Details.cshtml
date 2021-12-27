@@ -1,5 +1,46 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model TicketModule.Models.Ticket
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
 @{
+    ViewData["Title"] = "Review";
+    Layout = "_Layout";
 }
+<h1>Ticket Details</h1>
+
+<div>
+ <hr />
+ <div class="row">
+  <div class="col-md-8">
+   <dl class="row">
+	<dt class="col-sm-3">
+					@Html.DisplayNameFor(model => model.Title)
+	</dt>
+	<dd class="col-sm-9">
+					@Html.DisplayFor(model => model.Title)
+	</dd>
+	<dt class="col-sm-3">
+					@Html.DisplayNameFor(model => model.Description)
+	</dt>
+	<dd class="col-sm-9">
+					@Html.DisplayFor(model => model.Description)
+	</dd>
+	<dt class="col-sm-3">
+					@Html.DisplayNameFor(model => model.Resolution)
+	</dt>
+	<dd class="col-sm-9">
+					@Html.DisplayFor(model => model.Resolution)
+	</dd>
+	<dt class="col-sm-3">
+					@Html.DisplayNameFor(model => model.IsSolved)
+	</dt>
+	<dd class="col-sm-9">
+					@Html.DisplayFor(model => model.IsSolved)
+	</dd>
+   </dl>
+  </div>
+ </div>
+</div>
+
+<div>
+ <a asp-action="Index" class="btn btn-success">Back to List</a>
+</div>

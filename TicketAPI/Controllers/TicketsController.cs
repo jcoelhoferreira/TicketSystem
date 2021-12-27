@@ -44,6 +44,11 @@ namespace TicketAPI.Controllers
         [HttpGet("{id}")]
         public ActionResult<Ticket> GetTicket(int id)
         {
+            if (User.FindFirstValue(ClaimTypes.Role) != "Admin")
+            {
+                return Unauthorized();
+            }
+
             var ticket = _ticketRepository.GetTicket(id);
 
             if (ticket == null)
@@ -57,17 +62,28 @@ namespace TicketAPI.Controllers
         // PUT: api/Tickets/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTicket(int id, Ticket ticket)
+        public async Task<IActionResult> PutTicket(int id, TicketViewModel model)
         {
-            if (id != ticket.Id)
+            if (User.FindFirstValue(ClaimTypes.Role) != "Admin")
+            {
+                return Unauthorized();
+            }
+
+            if (id != model.Id)
             {
                 return BadRequest();
             }
 
             try
             {
+                var ticket = _ticketRepository.GetTicket(model.Id);
+                ticket.Resolution = model.Resolution;
+                ticket.IsSolved = true;
+
                 _ticketRepository.UpdateTicket(ticket);
                 await _ticketRepository.SaveAllAsync();
+
+                return Ok();
             }
             catch (DbUpdateConcurrencyException)
             {

@@ -35,8 +35,6 @@ namespace TicketModule
         {
             if (ModelState.IsValid)
             {
-                model.Email = _encryption.EncryptString(model.Email);
-                model.Password = _encryption.EncryptString(model.Password);
                 try
                 {
                     var result = await _apiUserService.RegisterAsync(model);
@@ -73,7 +71,7 @@ namespace TicketModule
                 var token = result.Message;
                 HttpContext.Session.SetString("JWToken", token);
             }
-            return Redirect("~/Account/Index");
+            return Redirect("~/TicketModule/Tickets/Index");
         }
 
         public IActionResult Logout()

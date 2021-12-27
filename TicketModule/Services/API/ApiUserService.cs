@@ -17,12 +17,12 @@ namespace TicketModule.Services.API
         private string baseUrl = "https://localhost:7249/api/";
 
         public async Task<ApiResponse> RegisterAsync(RegisterViewModel model)
-        {
+         {
             var client = new HttpClient();
             client.BaseAddress = new Uri(baseUrl);
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var response = client.PostAsJsonAsync("Account/Register", model).Result;
+            var response = client.PostAsJsonAsync("Account", model).Result;
             var result = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)

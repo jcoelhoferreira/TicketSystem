@@ -11,9 +11,9 @@ namespace TicketModule.Services.API
     public interface IApiTicketService
     {
         Task<ApiResponse> GetAllTickets(string accessToken);
-        Task<ApiResponse> GetApiTicket(int id);
+        Task<ApiResponse> GetApiTicket(int id, string accessToken);
         Task<ApiResponse> CreateApiTicket(NewTicketViewModel ticket, string accessToken);
-        Task<ApiResponse> EditApiTicket(Ticket ticket);
+        Task<ApiResponse> EditApiTicket(int id, TicketViewModel model, string accessToken);
         Task<ApiResponse> DeleteApiTicket(int id);
     }
 }
