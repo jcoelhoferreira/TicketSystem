@@ -30,7 +30,7 @@ namespace TicketModule
                     return View(tickets);
                 }
 
-                return RedirectToAction("Create");
+                return RedirectToAction("Index", "Home");
             }
             return RedirectToAction("Login", "Account");
         }
@@ -59,7 +59,12 @@ namespace TicketModule
         // GET: TicketsController/Create
         public IActionResult Create()
         {
-            return View();
+            var accessToken = HttpContext.Session.GetString("JWToken");
+            if (accessToken != null)
+            {
+                return View();
+            }
+            return RedirectToAction("Login", "Account");
         }
 
         // POST: TicketsController/Create

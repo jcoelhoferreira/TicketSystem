@@ -3,13 +3,15 @@
 
 @{
     ViewData["Title"] = "Register";
-    Layout = "_Layout";
+    Layout = "_Layout_Account";
 }
 
-<h2>Register</h2>
+
+<br />
 
 <div class="row">
     <div class="col-md-4 offset-md-4">
+        <h2>Register</h2>
         <form method="post">
             <div asp-validation-summary="ModelOnly"></div>
 
@@ -45,6 +47,7 @@
             <br />
             <div class="form-group">
                 <input type="submit" value="Submit" class="btn btn-success" />
+                <a asp-action="Login" class="btn btn-primary">Login</a>
             </div>
         </form>
     </div>

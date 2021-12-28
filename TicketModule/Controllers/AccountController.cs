@@ -78,7 +78,7 @@ namespace TicketModule
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login");
         }
 
         //// GET: TicketsController/Edit/5
