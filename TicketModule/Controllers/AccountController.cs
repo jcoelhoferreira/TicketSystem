@@ -56,6 +56,7 @@ namespace TicketModule
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel userInfo)
         {
             if (ModelState.IsValid)
@@ -64,14 +65,14 @@ namespace TicketModule
 
                 if (!result.IsSuccess)
                 {
-                    ViewBag.Message = "Incorrect Username or Password";
-                    return RedirectToAction("Index", "Home");
-                    //return Redirect("~/Home/Index");
+                    ViewBag.Message = "Incorrect Username or Password, try again please!";
+                    return View();
                 }
                 var token = result.Message;
                 HttpContext.Session.SetString("JWToken", token);
+                return RedirectToAction("Index", "Tickets");
             }
-            return Redirect("~/TicketModule/Tickets/Index");
+            return View();
         }
 
         public IActionResult Logout()

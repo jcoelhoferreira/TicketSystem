@@ -24,9 +24,17 @@ namespace TicketModule
             });
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IEndpointRouteBuilder routes)
         {
             app.UseSession();
+
+            routes.MapAreaControllerRoute
+            (
+                name: "Home",
+                areaName: "TicketModule",
+                pattern: "",
+                defaults: new { controller = "Account", action = "Login" }
+            );
         }
     }
 }

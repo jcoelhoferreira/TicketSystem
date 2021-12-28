@@ -1,4 +1,4 @@
-﻿@model TicketModule.Models.UserInfo
+﻿@model TicketModule.ViewModels.LoginViewModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
@@ -22,15 +22,16 @@
                 <input asp-for="Password" type="password" class="form-control" />
                 <span asp-validation-for="Password" class="text-warning"></span>
             </div>
+            <br />
             <div class="form-group">
                 <input type="submit" value="Login" class="btn btn-success" />
                 <a asp-action="Register" class="btn btn-primary">Create Account</a>
             </div>
+            <div class="text-danger">
+                <strong>
+                    @ViewBag.Message
+                </strong>
+            </div>
         </form>
     </div>
-</div>
-<div class="text-success">
-    <p>
-        @ViewBag.Message
-    </p>
 </div>

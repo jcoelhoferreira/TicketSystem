@@ -1,5 +1,4 @@
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 builder.Services.AddOrchardCore().AddMvc();
 
@@ -13,10 +12,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-app.UseRouting();
+//app.UseRouting();
 
 app.UseOrchardCore();
 

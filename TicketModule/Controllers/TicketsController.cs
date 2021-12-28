@@ -30,7 +30,7 @@ namespace TicketModule
                     return View(tickets);
                 }
 
-                //return View();
+                return RedirectToAction("Create");
             }
             return RedirectToAction("Login", "Account");
         }
